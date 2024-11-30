@@ -29,7 +29,7 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));  // También con
 app.use('/api/personas', routerPersona);
 app.use('/api/rol_opciones', routerRolOpciones);
 app.use('/api/rol_rol_opciones', routerRolRolOpciones);
-app.use('/api/usuarios', routerUsuario);
+app.use('/api', routerUsuario);
 app.use('/api/rol', routerRol);
 app.use('/api/rolUsuarios', routerRolUsuario);
 app.use('/api/sesion', routerSesion);

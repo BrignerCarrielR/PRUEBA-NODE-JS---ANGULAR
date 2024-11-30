@@ -4,12 +4,14 @@ import { UsuariosController } from "../controllers/usuarioControllers.js";
 
 const routerUsuario = Router();
 
-routerUsuario.get("/", UsuariosController.getUsuarios);
-routerUsuario.get("/:id", UsuariosController.getUsuario);
-routerUsuario.post("/", UsuariosController.insertUsuario);
-routerUsuario.put("/:id", UsuariosController.putUsuario);
-routerUsuario.put("/:id/estado", UsuariosController.putEstadoUsuario);
-routerUsuario.post("/login", UsuariosController.Login);
-routerUsuario.get("/logout/:id", UsuariosController.Logout);
+routerUsuario.get("/usuarios/", UsuariosController.getUsuarios);
+routerUsuario.get("/usuarios/:id", UsuariosController.getUsuario);
+routerUsuario.post("/usuarios/", UsuariosController.insertUsuario);
+routerUsuario.put("/usuarios/:id", UsuariosController.putUsuario);
+routerUsuario.put("/usuarios/estado/:id", UsuariosController.putEstadoUsuario);
+routerUsuario.post("/usuarios/login", UsuariosController.Login);
+routerUsuario.get("/usuarios/logout/:id", UsuariosController.Logout);
+routerUsuario.get("/usuarios_stats/", UsuariosController.statsUsuario);
+
 
 export default routerUsuario;

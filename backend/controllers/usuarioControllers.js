@@ -138,4 +138,15 @@ export class UsuariosController {
             });
         }
     }
+
+    static async statsUsuario(req, res) {
+        try {
+            const data = await UsuariosModel.getUsuarioStats();
+            res.status(201).send(data);
+        } catch (error) {
+            res.status(500).send({  // Manejo del error
+            });
+        }
+    }
+
 }

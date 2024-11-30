@@ -7,11 +7,17 @@ export const queries = {
     putEstadoPersonas: `UPDATE Persona SET estado = 'I' WHERE idPersona = $1;`,
 
     // Tabla Usuarios
-    getUsuarios: `SELECT idUsuario, UserName, Mail, SessionActive, Persona_idPersona, Status FROM Usuarios WHERE estado = 'A';`,
-    getIdUsuarios: `SELECT idUsuario, UserName, Mail, SessionActive, Persona_idPersona, Status FROM Usuarios WHERE idUsuario = $1 AND estado = 'A';`,
-    postUsuarios: `INSERT INTO Usuarios (UserName, Password, Mail, SessionActive, Persona_idPersona, Status, estado) VALUES ($1, $2, $3, $4, $5, $6, 'A');`,
-    putEUsuarios: `UPDATE Usuarios SET UserName = $1, Password = $2,  SessionActive = $3, Persona_idPersona = $4, Status = $5 WHERE idUsuario = $6;`,
+    getUsuarios: `SELECT idUsuario, UserName, Mail, SessionActive, Persona_idPersona, Status FROM Usuarios WHERE estado = 'Activo';;`,
+    getIdUsuarios: `SELECT idUsuario, UserName, Mail, SessionActive, Persona_idPersona, Status FROM Usuarios WHERE idUsuario = $1 AND estado = 'Activo';`,
+    postUsuarios: `INSERT INTO Usuarios (UserName, Password, Mail, SessionActive, Persona_idPersona, Status, estado) VALUES ($1, $2, $3, $4, $5, $6, 'Activo');`,
+    putEUsuarios: `UPDATE Usuarios SET UserName = $1, Password = $2,  SessionActive = $3,  Status = $4 WHERE idUsuario = $5;`,
     putEstadoUsuarios: `UPDATE Usuarios SET estado = 'I' WHERE idUsuario = $1;`,
+
+    statsUsuario:'SELECT \n' +
+        '    COUNT(*) FILTER (WHERE estado = \'Activo\') AS activos,\n' +
+        '    COUNT(*) FILTER (WHERE estado = \'Inactivo\') AS inactivos,\n' +
+        '    COUNT(*) FILTER (WHERE estado = \'Bloqueado\') AS bloqueados\n' +
+        'FROM usuarios;\n',
 
     // Tabla Rol
     getRoles: `SELECT idRol, RolName FROM Rol WHERE estado = 'A';`,

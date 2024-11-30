@@ -1,0 +1,59 @@
+<app-inicio>
+  <div class="min-h-screen bg-gray-100 p-6">
+    <h1 class="text-3xl font-semibold text-center text-indigo-600 mb-6">
+      Mantenimiento de Usuarios
+    </h1>
+
+    <!-- Filtro de búsqueda -->
+    <div class="mb-6 flex justify-center">
+      <input (input)="filterUsuarios($event)" class="p-2 border rounded-md" placeholder="Buscar usuario" />
+    </div>
+
+    <!-- Botón para cargar archivo -->
+    <div class="mb-6 flex justify-center">
+      <input
+        type="file"
+        accept=".xlsx,.csv"
+        (change)="onFileChange($event)"
+        class="p-2 border rounded-md"
+      />
+    </div>
+
+    <!-- Tabla de usuarios -->
+    <table class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
+      <thead>
+      <tr>
+        <th class="px-4 py-2 text-left">Nombre</th>
+        <th class="px-4 py-2 text-left">Email</th>
+        <th class="px-4 py-2 text-left">Estado</th>
+        <th class="px-4 py-2 text-left">Rol</th>
+        <th class="px-4 py-2 text-left">Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let user of filteredUsuarios">
+        <td class="px-4 py-2">{{ user.nombre }}</td>
+        <td class="px-4 py-2">{{ user.email }}</td>
+        <td class="px-4 py-2">
+          <button
+            *ngIf="isAdmin"
+            (click)="updateUserStatus(user, user.estado === 'Activo' ? 'Inactivo' : 'Activo')"
+            class="bg-yellow-500 text-white px-3 py-1 rounded"
+          >
+            {{ user.estado }}
+          </button>
+        </td>
+        <td class="px-4 py-2">{{ user.rol }}</td>
+        <td class="px-4 py-2">
+          <button
+            (click)="updateUser(user)"
+            class="bg-blue-500 text-white px-3 py-1 rounded"
+          >
+            Actualizar
+          </button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</app-inicio>

@@ -113,6 +113,20 @@ export class UsuariosModel {
             db.release();
         }
     }
+
+    // Actualizar el estado de un usuario
+    static async getUsuarioStats() {
+        const db = await pool.connect();
+        try {
+
+            const result = await db.query(queries.statsUsuario);
+
+            return result.rows;  // Devuelve la primera fila con los resultados
+        } catch (error) {
+        } finally {
+            db.release();
+        }
+    }
     // InciarSesion
     static async login(credentials) {
         const db = await pool.connect();
@@ -121,7 +135,7 @@ export class UsuariosModel {
             console.log(UserNameOrEmail);
 
             // Consultar usuario por correo o nombre de usuario
-            const userQuery = `SELECT idUsuario,username, Password, SessionActive, Status, Estado, FailedAttempts FROM Usuarios WHERE (UserName = $1 OR Mail = $1) AND estado = 'A';`;
+            const userQuery = `SELECT idUsuario,username, Password, SessionActive, Status, Estado, FailedAttempts FROM Usuarios WHERE (UserName = $1 OR Mail = $1) AND estado = 'Activo';`;
             const userResult = await db.query(userQuery, [UserNameOrEmail]);
             console.log(userResult);
 
@@ -159,7 +173,7 @@ export class UsuariosModel {
             await db.query(resetAttemptsQuery, [user.idusuario]);
 
             // Verificar si ya hay sesión activa
-            if (user.sessionactive === "A") {
+            if (user.sessionactive === "Active") {
                 throw new Error("El usuario ya tiene una sesión activa.");
             }
 
@@ -192,7 +206,7 @@ export class UsuariosModel {
 
             const user = sessionResult.rows[0];
 
-            if (user.sessionactive !== "A") {
+            if (user.sessionactive !== "I") {
                 throw new Error("No hay una sesión activa para este usuario.");
             }
 
