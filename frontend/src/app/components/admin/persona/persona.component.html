@@ -1,0 +1,64 @@
+<app-inicio>
+  <div class="container mx-auto mt-10">
+    <h1 class="text-2xl font-bold mb-5">Gestión de Personas</h1>
+
+    <!-- Formulario para agregar/editar personas -->
+    <form class="space-x-2" (ngSubmit)="isEditing() ? editarPersona() : agregarPersona()" #personaForm="ngForm">
+      <input
+        type="text"
+        [(ngModel)]="personaFormulario.Nombres"
+        name="Nombres"
+        placeholder="Nombres"
+        required
+      />
+      <input
+        type="text"
+        [(ngModel)]="personaFormulario.Apellidos"
+        name="Apellidos"
+        placeholder="Apellidos"
+        required
+      />
+      <input
+        type="text"
+        [(ngModel)]="personaFormulario.Identificacion"
+        name="Identificacion"
+        placeholder="Identificación"
+        required
+      />
+      <input
+        type="date"
+        [(ngModel)]="personaFormulario.FechaNacimiento"
+        name="FechaNacimiento"
+        required
+      />
+      <button class="bg-gray-600 my-2 text-white rounded-lg py-1 px-3" type="submit" [disabled]="!personaForm.valid">
+        {{ isEditing() ? 'Editar Persona' : 'Agregar Persona' }}
+      </button>
+    </form>
+
+    <!-- Tabla de personas -->
+    <table class="table-auto w-full border-collapse border border-gray-300">
+      <thead>
+      <tr class="bg-gray-200">
+        <th class="border border-gray-300 px-4 py-2">Nombres</th>
+        <th class="border border-gray-300 px-4 py-2">Apellidos</th>
+        <th class="border border-gray-300 px-4 py-2">Identificacion</th>
+        <th class="border border-gray-300 px-4 py-2">Fe nacimiento</th>
+        <th class="border border-gray-300 px-4 py-2">Acciones</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr *ngFor="let persona of listaPersonas">
+        <td class="border border-gray-300 px-4 py-2">{{ persona.nombres }}</td>
+        <td class="border border-gray-300 px-4 py-2">{{ persona.apellidos }}</td>
+        <td class="border border-gray-300 px-4 py-2">{{ persona.identificacion }}</td>
+        <td class="border border-gray-300 px-4 py-2">{{ persona.fechanacimiento }}</td>
+        <td class="border border-gray-300 px-4 py-2">
+          <button class="text-blue-500" (click)="seleccionarPersona(persona)">Editar</button>
+          <button class="text-red-500" (click)="eliminarPersona(persona.idpersona)">Eliminar</button>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</app-inicio>

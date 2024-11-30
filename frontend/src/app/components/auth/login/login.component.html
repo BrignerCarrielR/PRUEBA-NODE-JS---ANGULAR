@@ -1,0 +1,27 @@
+<div class="flex justify-center items-center overflow-y-auto h-[calc(100vh-110px)]">
+  <div class="bg-white w-80 rounded-lg shadow-lg p-10">
+    <p class="uppercase font-bold opacity-70">Iniciar Sesión</p>
+    <form (ngSubmit)="login()">
+      <div class="mt-5 flex flex-col space-y-2">
+        <input class="py-2 px-3 border w-full rounded-lg"
+               type="text"
+               placeholder="Usuario"
+               [(ngModel)]="dataLogin.UserNameOrEmail"
+               name="UserNameOrEmail"
+        >
+        <input class="py-2 px-3 border w-full rounded-lg"
+               type="password"
+               placeholder="Contraseña"
+               [(ngModel)]="dataLogin.Password"
+               name="Password"
+        >
+      </div>
+      <button type="submit"
+              class="py-1 w-full bg-red-500 mt-5 font-bold text-white rounded-lg hover:bg-red-600"
+              [disabled]="!dataLogin.UserNameOrEmail || !dataLogin.Password"
+      >
+        Iniciar sesión
+      </button>
+    </form>
+  </div>
+</div>
