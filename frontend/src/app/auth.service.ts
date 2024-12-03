@@ -36,21 +36,21 @@ export class AuthService {
     return this._es_staff;
   }
 
-  loginUser(id: number, nombre: string, es_staff: string): void {
+  loginUser(id: number, username: string, rol: string): void {
     // Limpiar el valor de es_staff y convertirlo a booleano
     this._idUser = id;
-    this._nombreUser = nombre;
+    this._nombreUser = username;
     this._login = true;
 
     // Aquí puedes limpiar los espacios en es_staff y convertirlo a booleano
-    this._es_staff = es_staff.trim() === 'A'; // Si 'A' -> true, si 'I' -> false
+    this._es_staff = rol === 'Administrador'; // Si 'A' -> true, si 'I' -> false
 
     // Guardar los datos en localStorage
     localStorage.setItem('user_id', id.toString());
-    localStorage.setItem('nombre_usuario', nombre);
+    localStorage.setItem('nombre_usuario', username);
     localStorage.setItem('staff', this._es_staff.toString());
 
-    console.log("Iniciando sesión:", { id, nombre, es_staff });
+    console.log("Iniciando sesión:", { id, username, rol });
   }
 
   logoutUser(): void {

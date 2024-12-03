@@ -24,16 +24,16 @@ export class AppComponent {
   }
 
   CerrarSesion() {
-    this.apiService.get(`usuarios/logout/${this.authService.id}`)
+    this.apiService.get(`logout/${this.authService.id}`)
       .subscribe(
-        data => {
-          alert(data)
+        (data: any) => {
+          alert(data.message)
           this.authService.logoutUser();
           window.location.href="/";
         },
         error => {
-          console.error(error);
-          alert(error)
+          console.error(error.message);
+          alert(error.message)
         }
       );
 

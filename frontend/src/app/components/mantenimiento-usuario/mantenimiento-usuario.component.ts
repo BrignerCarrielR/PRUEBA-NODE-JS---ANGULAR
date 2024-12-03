@@ -3,44 +3,57 @@ import { CommonModule } from '@angular/common';
 import * as XLSX from 'xlsx';
 import * as Papa from 'papaparse';
 import { ParseResult } from 'papaparse';
-import { InicioComponent } from '../../inicio/inicio.component';
+import { InicioComponent } from '../inicio/inicio.component';
+import {AuthService} from '../../auth.service';
+import {ApiService} from '../../api.service';
+import {ActivatedRoute} from '@angular/router';
 
-// Definimos la interfaz Usuario para que TypeScript reconozca correctamente las propiedades
 interface Usuario {
-  id: number;
-  nombre: string;
-  email: string;
-  estado: string;
-  rol: string;
+  idusuario: number;
+  nombres: string;
+  apellidos: string;
+  mail: string;
+  rolname: string;
+  status: string;
+  username: string;
 }
 
 @Component({
   selector: 'app-mantenimiento-usuario',
   standalone: true,
   imports: [CommonModule, InicioComponent], // Asegúrate de incluir CommonModule
+  providers: [ApiService],
   templateUrl: './mantenimiento-usuario.component.html',
   styleUrls: ['./mantenimiento-usuario.component.css']
 })
 export class MantenimientoUsuarioComponent implements OnInit {
-  usuarios: Usuario[] = [];  // Declaramos 'usuarios' con tipo explícito 'Usuario[]'
+  usuarios: Usuario[] = [];
   filteredUsuarios: Usuario[] = [];
-  isAdmin: boolean = true;  // Simulando que el usuario es administrador
+  idlogin: number | null = null;
+  isAdmin: boolean = true;
   selectedFile: any = null;
 
-  constructor() { }
+  constructor( private authService: AuthService, private apiService: ApiService, private route: ActivatedRoute ) { }
 
   ngOnInit(): void {
-    this.loadUsuarios();  // Cargar los usuarios iniciales
+    this.loadUsuarios();
+    this.idlogin = this.authService.id;
   }
 
   // Simular usuarios para la demostración
   loadUsuarios(): void {
-    this.usuarios = [
-      { id: 1, nombre: 'Juan Pérez', email: 'juan@correo.com', estado: 'Activo', rol: 'Usuario' },
-      { id: 2, nombre: 'Carlos Gómez', email: 'carlos@correo.com', estado: 'Inactivo', rol: 'Admin' },
-      { id: 3, nombre: 'Ana Rodríguez', email: 'ana@correo.com', estado: 'Activo', rol: 'Usuario' },
-    ];
-    this.filteredUsuarios = [...this.usuarios];
+    this.apiService.get<Usuario[]>(`usuarios`)
+      .subscribe(
+        data => {
+          this.usuarios = data;
+          this.filteredUsuarios = data;
+          console.log('Usuarios',this.usuarios);
+        },
+        error => {
+          console.error(error.message);
+          alert(error.message);
+        }
+      );
   }
 
   // Cargar el archivo Excel o CSV
@@ -94,19 +107,19 @@ export class MantenimientoUsuarioComponent implements OnInit {
       headers.forEach((header: string, index: number) => {
         switch(header.toLowerCase()) {
           case 'id':
-            user.id = row[index];
+            user.idusuario = row[index];
             break;
           case 'nombre':
-            user.nombre = row[index];
+            user.nombres = row[index];
             break;
           case 'email':
-            user.email = row[index];
+            user.mail = row[index];
             break;
           case 'estado':
-            user.estado = row[index];
+            user.status = row[index];
             break;
           case 'rol':
-            user.rol = row[index];
+            user.rolname = row[index];
             break;
         }
       });
@@ -119,9 +132,9 @@ export class MantenimientoUsuarioComponent implements OnInit {
 
   // Actualizar los datos del usuario
   updateUser(user: Usuario): void {
-    if (this.isAdmin || user.rol !== 'Admin') {
+    if (this.isAdmin || user.rolname !== 'Admin') {
       // Lógica para permitir que el administrador actualice datos de otros usuarios, pero no sus propios datos
-      const index = this.usuarios.findIndex(u => u.id === user.id);
+      const index = this.usuarios.findIndex(u => u.idusuario === user.idusuario);
       if (index !== -1) {
         this.usuarios[index] = user;
         alert('Usuario actualizado exitosamente');
@@ -134,9 +147,9 @@ export class MantenimientoUsuarioComponent implements OnInit {
   // Cambiar estado de usuario (solo admin)
   updateUserStatus(user: Usuario, status: string): void {
     if (this.isAdmin) {
-      const index = this.usuarios.findIndex(u => u.id === user.id);
+      const index = this.usuarios.findIndex(u => u.idusuario === user.idusuario);
       if (index !== -1) {
-        this.usuarios[index].estado = status;
+        this.usuarios[index].status = status;
         alert('Estado del usuario actualizado');
       }
     }
@@ -153,8 +166,8 @@ export class MantenimientoUsuarioComponent implements OnInit {
     }
 
     this.filteredUsuarios = this.usuarios.filter(user =>
-      user.nombre.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      user.email.toLowerCase().includes(searchTerm.toLowerCase())
+      user.nombres.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.mail.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }
 

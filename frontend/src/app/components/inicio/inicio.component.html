@@ -3,14 +3,14 @@
     <div class="w-96">
       <div class=" opacity-70">
         <p class="text-xl font-semibold">Hola, {{ nombreUsuario }} </p>
-        <p>Te damos la bienvenida a tu cuenta</p>
+        <p>Te damos la bienvenida a tu cuenta de {{rol}}</p>
       </div>
       <div class="flex flex-col space-y-3 mt-8">
         <!-- Usando *ngFor para recorrer los elementos del menú -->
         <a *ngFor="let item of menuItems"
            class="flex space-x-1"
-           [ngClass]="{'text-red-600 font-semibold': isActive(item.route)}"
-           [routerLink]="item.route">
+           [ngClass]="{'text-gray-600 font-bold': isActive(item.url)}"
+           [routerLink]="item.url">
           <p>{{ item.nombreopcion }}</p>
         </a>
       </div>
@@ -22,15 +22,15 @@
             <h2 class="text-2xl font-semibold text-center text-indigo-600 mb-4">Bienvenido</h2>
 
             <div class="mb-4">
-              <p class="text-lg font-medium">Nombre de usuario: <span class="text-gray-700">{{ usuario.nombre }}</span></p>
-              <p class="text-lg font-medium">Correo electrónico: <span class="text-gray-700">{{ usuario.email }}</span></p>
+              <p class="text-lg font-medium">Nombre de usuario: <span class="text-gray-700">{{ usuario.username }}</span></p>
+              <p class="text-lg font-medium">Correo electrónico: <span class="text-gray-700">{{ usuario.mail }}</span></p>
             </div>
 
             <div class="mb-4">
               <p class="text-lg font-medium">Última sesión:</p>
-              <p class="text-sm text-gray-600">Intentos fallidos: <span class="font-bold">{{ usuario.intentosFallidos }}</span></p>
-              <p class="text-sm text-gray-600">Hora de inicio: <span class="font-bold">{{ usuario.horaInicio | date:'short' }}</span></p>
-              <p class="text-sm text-gray-600">Hora de fin: <span class="font-bold">{{ usuario.horaFin | date:'short' }}</span></p>
+              <p class="text-sm text-gray-600">Intentos fallidos: <span class="font-bold">{{ usuario.intentosfallidos }}</span></p>
+              <p class="text-sm text-gray-600">Hora de inicio: <span class="font-bold">{{ usuario.fechaingresosesion | date:'short' }}</span></p>
+              <p class="text-sm text-gray-600">Hora de fin: <span class="font-bold">{{ usuario.fechacierresesion | date:'short' }}</span></p>
             </div>
 
             <div class="mt-6 text-center">

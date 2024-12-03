@@ -1,53 +1,33 @@
 export const queries = {
-    // Tabla Persona
-    getPersonas: `SELECT idPersona, Nombres, Apellidos, Identificacion, FechaNacimiento FROM Persona WHERE estado = 'A';`,
-    getIdPersonas: `SELECT idPersona, Nombres, Apellidos, Identificacion, FechaNacimiento FROM Persona WHERE idPersona = $1 AND estado = 'A';`,
-    postPersonas: `INSERT INTO Persona (Nombres, Apellidos, Identificacion, FechaNacimiento, estado) VALUES ($1, $2, $3, $4, 'A');`,
-    putEPersonas: `UPDATE Persona SET Nombres = $1, Apellidos = $2, Identificacion = $3, FechaNacimiento = $4 WHERE idPersona = $5;`,
-    putEstadoPersonas: `UPDATE Persona SET estado = 'I' WHERE idPersona = $1;`,
+    // Login
+    getUsuarioCorreo : 'select u.idUsuario, u.username, u.password, r.rolname , u.sessionactive, u.Status, u.FailedAttempts FROM Usuarios u JOIN Persona p ON u.Persona_idPersona = p.idPersona LEFT JOIN Rol_Usuarios ru ON u.idUsuario = ru.idUsuario LEFT JOIN Rol r ON ru.idRol = r.idRol where (username = $1 or mail = $1);',
+    putActualizarIntentos : 'UPDATE Usuarios SET FailedAttempts = FailedAttempts + 1 WHERE idUsuario = $1;',
+    putBloquearUsuario: 'UPDATE Usuarios SET Status = \'Bloqueado\' WHERE idUsuario = $1;',
+    putResetearIntentos:'UPDATE Usuarios SET FailedAttempts = 0 WHERE idUsuario = $1;',
+    postSesion: 'insert into sessions(idusuario, fechaingreso) values ( $1,NOW());',
+    putSesionActive:'UPDATE Usuarios SET sessionactive = \'S\' WHERE idUsuario = $1;',
 
-    // Tabla Usuarios
-    getUsuarios: `SELECT idUsuario, UserName, Mail, SessionActive, Persona_idPersona, Status FROM Usuarios WHERE estado = 'Activo';;`,
-    getIdUsuarios: `SELECT idUsuario, UserName, Mail, SessionActive, Persona_idPersona, Status FROM Usuarios WHERE idUsuario = $1 AND estado = 'Activo';`,
-    postUsuarios: `INSERT INTO Usuarios (UserName, Password, Mail, SessionActive, Persona_idPersona, Status, estado) VALUES ($1, $2, $3, $4, $5, $6, 'Activo');`,
-    putEUsuarios: `UPDATE Usuarios SET UserName = $1, Password = $2,  SessionActive = $3,  Status = $4 WHERE idUsuario = $5;`,
-    putEstadoUsuarios: `UPDATE Usuarios SET estado = 'I' WHERE idUsuario = $1;`,
+    // Logout
+    getSesionActive:'select sessionactive from Usuarios where idUsuario = $1',
+    putSesionInactive:'UPDATE Usuarios SET sessionactive = \'N\' WHERE idUsuario = $1;',
+    putFechaSesionInactive:'update sessions set fechacierre = NOW() where fechacierre is null and idusuario = $1 ',
 
-    statsUsuario:'SELECT \n' +
-        '    COUNT(*) FILTER (WHERE estado = \'Activo\') AS activos,\n' +
-        '    COUNT(*) FILTER (WHERE estado = \'Inactivo\') AS inactivos,\n' +
-        '    COUNT(*) FILTER (WHERE estado = \'Bloqueado\') AS bloqueados\n' +
-        'FROM usuarios;\n',
+    // Informacion del sistema
+    getDatosB: 'SELECT u.UserName, u.mail, u.Status AS UsuarioEstado, u.FailedAttempts AS IntentosFallidos, s.FechaIngreso AS FechaIngresoSesion, s.FechaCierre AS FechaCierreSesion FROM Usuarios u JOIN Persona p ON u.Persona_idPersona = p.idPersona LEFT JOIN sessions s ON u.idUsuario = s.idUsuario WHERE u.idUsuario = $1 AND s.FechaIngreso < (SELECT MAX(FechaIngreso) FROM sessions WHERE idUsuario = u.idUsuario) ORDER BY s.FechaIngreso DESC NULLS LAST LIMIT 1;',
+    getDashboard : 'select count(*) filter (where status = \'Activo\') as activos, count(*) filter (where status = \'Inactivo\') as inactivos, count(*) filter (where status = \'Bloqueado\') as bloqueados, count(*) filter (where FailedAttempts > 0) as sesion_fallidas from usuarios;',
+    getMemuUsuario : 'select r.rolname, r2.idopcion, r2.nombreopcion, r2.url from usuarios u, rol_usuarios ru, rol r, rol_rolopciones rr , rolopciones r2 where u.idusuario = ru.idusuario and ru.idrol =r.idrol and r.idrol = rr.idrol and rr.idopcion = r2.idopcion and r2.eliminado = false and u.idusuario = $1',
 
-    // Tabla Rol
-    getRoles: `SELECT idRol, RolName FROM Rol WHERE estado = 'A';`,
-    getIdRoles: `SELECT idRol, RolName FROM Rol WHERE idRol = $1 AND estado = 'A';`,
-    postRoles: `INSERT INTO Rol (RolName, estado) VALUES ($1, 'A');`,
-    putERoles: `UPDATE Rol SET RolName = $1 WHERE idRol = $2;`,
-    putEstadoRoles: `UPDATE Rol SET estado = 'I' WHERE idRol = $1;`,
-
-    // Tabla Rol_Usuarios
-    getRolUsuarios: `SELECT idRol, idUsuario FROM Rol_Usuarios WHERE estado = 'A';`,
-    getIdRolUsuarios: `SELECT idRol, idUsuario FROM Rol_Usuarios WHERE idRol = $1 AND idUsuario = $2 AND estado = 'A';`,
-    postRolUsuarios: `INSERT INTO Rol_Usuarios (idRol, idUsuario, estado) VALUES ($1, $2, 'A');`,
-    putERolUsuarios: `UPDATE Rol_Usuarios SET idRol = $1, idUsuario = $2 WHERE idRol = $3 AND idUsuario = $4;`,
-    putEstadoRolUsuarios: `UPDATE Rol_Usuarios SET estado = 'I' WHERE idRol = $1 AND idUsuario = $2;`,
-
-    // Tabla RolOpciones
-    getRolOpciones: `SELECT idOpcion, NombreOpcion FROM RolOpciones WHERE estado = 'A';`,
-    getIdRolOpciones: `SELECT idOpcion, NombreOpcion FROM RolOpciones WHERE idOpcion = $1 AND estado = 'A';`,
-    postRolOpciones: `INSERT INTO RolOpciones (NombreOpcion, estado) VALUES ($1, 'A');`,
-    putERolOpciones: `UPDATE RolOpciones SET NombreOpcion = $1 WHERE idOpcion = $2;`,
-    putEstadoRolOpciones: `UPDATE RolOpciones SET estado = 'I' WHERE idOpcion = $1;`,
-
-    // Tabla Rol_RolOpciones
-    getRolRolOpciones: `SELECT idRol, idOpcion FROM Rol_RolOpciones WHERE estado = 'A';`,
-    getIdRolRolOpciones: `SELECT idRol, idOpcion FROM Rol_RolOpciones WHERE idRol = $1 AND idOpcion = $2 AND estado = 'A';`,
-    postRolRolOpciones: `INSERT INTO Rol_RolOpciones (idRol, idOpcion, estado) VALUES ($1, $2, 'A');`,
-    putERolRolOpciones: `UPDATE Rol_RolOpciones SET idRol = $1, idOpcion = $2 WHERE idRol = $3 AND idOpcion = $4;`,
-    putEstadoRolRolOpciones: `UPDATE Rol_RolOpciones SET estado = 'I' WHERE idRol = $1 AND idOpcion = $2;`,
-
-    // Tabla Sessions
-    getSessions: `SELECT FechaIngreso, FechaCierre, idUsuario FROM Sessions;`,
-    postSessions: `INSERT INTO Sessions (FechaIngreso, FechaCierre, idUsuario) VALUES ($1, $2, $3);`,
+    // Usuario
+    getUsuario: 'select p.nombres, p. apellidos , u.username , u.mail from usuarios u , persona p where u.persona_idpersona= p.idpersona and u.idusuario = $1',
+    getUsuariosAdmin :'SELECT u.idUsuario, p.Nombres, p.Apellidos, u.UserName, u.Mail, r.RolName, u.Status FROM Usuarios u JOIN Persona p ON u.Persona_idPersona = p.idPersona LEFT JOIN Rol_Usuarios ru ON u.idUsuario = ru.idUsuario LEFT JOIN Rol r ON ru.idRol = r.idRol;',
+    putUsuario : 'CALL actualizar_usuario_persona($1, $2, $3, $4, $5);',
+    postUsario: 'select crear_usuario_con_validaciones($1, $2, $3, $4, $5);',
 };
+
+// CALL crear_usuario_con_validaciones(
+//     'Juan Alberto',
+//     'Piguave Loor',
+//     '1203574901',
+//     'jpiguavel',
+//     'Piguave123!'
+// );

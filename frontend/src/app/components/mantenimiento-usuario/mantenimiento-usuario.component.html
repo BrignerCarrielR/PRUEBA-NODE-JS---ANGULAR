@@ -1,12 +1,12 @@
 <app-inicio>
   <div class="min-h-screen bg-gray-100 p-6">
-    <h1 class="text-3xl font-semibold text-center text-indigo-600 mb-6">
+    <h1 class="text-2xl text-center text-gray-600 font-bold mb-6">
       Mantenimiento de Usuarios
     </h1>
 
     <!-- Filtro de búsqueda -->
     <div class="mb-6 flex justify-center">
-      <input (input)="filterUsuarios($event)" class="p-2 border rounded-md" placeholder="Buscar usuario" />
+      <input (input)="filterUsuarios($event)" class="p-2 border rounded-md" placeholder="Buscar usuario"/>
     </div>
 
     <!-- Botón para cargar archivo -->
@@ -32,23 +32,19 @@
       </thead>
       <tbody>
       <tr *ngFor="let user of filteredUsuarios">
-        <td class="px-4 py-2">{{ user.nombre }}</td>
-        <td class="px-4 py-2">{{ user.email }}</td>
+        <td class="px-4 py-2">{{ user.nombres }}</td>
+        <td class="px-4 py-2">{{ user.mail }}</td>
         <td class="px-4 py-2">
           <button
-            *ngIf="isAdmin"
-            (click)="updateUserStatus(user, user.estado === 'Activo' ? 'Inactivo' : 'Activo')"
-            class="bg-yellow-500 text-white px-3 py-1 rounded"
-          >
-            {{ user.estado }}
+            *ngIf="isAdmin" (click)="updateUserStatus(user, user.status === 'Activo' ? 'Inactivo' : 'Activo')"
+            class="bg-yellow-500 text-white px-3 py-1 rounded">
+            {{ user.status }}
           </button>
         </td>
-        <td class="px-4 py-2">{{ user.rol }}</td>
-        <td class="px-4 py-2">
-          <button
-            (click)="updateUser(user)"
-            class="bg-blue-500 text-white px-3 py-1 rounded"
-          >
+        <td class="px-4 py-2">{{ user.rolname }}</td>
+        <td *ngIf="isAdmin" class="px-4 py-2">
+          <button *ngIf="user.rolname === 'Usuario' || user.rolname === null || user.idusuario === idlogin " (click)="updateUser(user)"
+                  class="bg-blue-500 text-white px-3 py-1 rounded">
             Actualizar
           </button>
         </td>

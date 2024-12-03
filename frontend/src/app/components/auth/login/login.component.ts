@@ -16,38 +16,25 @@ import {AuthService} from '../../../auth.service';  // Importa el servicio
 export class LoginComponent {
 
   dataLogin = {
-    UserNameOrEmail: '',
-    Password: ''
+    username: '',
+    password: ''
   }
 
   constructor(private authService: AuthService, private apiService: ApiService) {
   }
 
   login() {
-    this.apiService.post('usuarios/login', this.dataLogin)
+    console.log(this.dataLogin);
+    this.apiService.post('login', this.dataLogin)
       .subscribe(
         (data: any) => {
-          // Limpiamos el valor de 'status' usando trim() para quitar espacios extra
-          const iduser = data.data.iduser;
-          const usuario = data.data.usuario;
-          const status = data.data.status.trim(); // Elimina los espacios adicionales
-
-          console.log(iduser, usuario, status);  // Imprime los datos sin espacios extra
-
-          // Verificamos que la respuesta tenga los datos esperados
-          if (iduser && usuario && status) {
-            // Iniciamos sesión con los datos recibidos
-            this.authService.loginUser(iduser, usuario, status);
-            console.log('Usuario logueado:', { iduser, usuario, status });
-            window.location.href='/inicio'
-          } else {
-            console.error('Respuesta incompleta del servidor:', data);
-            alert('Datos incompletos o erróneos recibidos del servidor.');
-          }
+          console.log(data)
+          this.authService.loginUser(data.iduser,data.usuario,data.rol)
+          window.location.href= '/inicio';
         },
         error => {
-          console.error('Error al iniciar sesión:', error);
-          alert('Error al iniciar sesión.');
+          console.error('Error al iniciar sesión:', error.message);
+          alert(error.message);
         }
       );
   }

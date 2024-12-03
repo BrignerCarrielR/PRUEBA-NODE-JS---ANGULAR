@@ -1,82 +1,83 @@
-import { Component } from '@angular/core';
-import { AuthService } from '../../auth.service';
-import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import {Component} from '@angular/core';
+import {AuthService} from '../../auth.service';
+import {Router} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {RouterModule} from '@angular/router';
 import {ApiService} from '../../api.service';
 import {HttpClientModule} from '@angular/common/http';
+
+
+interface MenuItem {
+  nombreopcion: string;  // nombre del menú
+  url: string;  // url del menú
+}
+
+interface Usuario {
+  username: string,
+  mail: string,
+  usuarioestado: string,
+  intentosfallidos: number,
+  fechaingresosesion: string,
+  fechacierresesion: string,
+}
 
 @Component({
   selector: 'app-inicio',
   standalone: true,  // Indicando que es un componente standalone
-  imports: [CommonModule, RouterModule,HttpClientModule],  // Asegúrate de importar los módulos necesarios
+  imports: [CommonModule, RouterModule, HttpClientModule],  // Asegúrate de importar los módulos necesarios
   providers: [ApiService],
   templateUrl: './inicio.component.html',
   styleUrls: ['./inicio.component.css']
 })
 export class InicioComponent {
-  usuario = {
-    nombre: 'Juan Pérez',
-    email: 'juan.perez@ejemplo.com',
-    intentosFallidos: 3,
-    horaInicio: new Date('2024-11-28T08:30:00'),
-    horaFin: new Date('2024-11-28T09:00:00'),
+  usuario: Usuario = {
+    username: '',
+    mail: '',
+    usuarioestado: '',
+    intentosfallidos: 0,
+    fechaingresosesion: '',
+    fechacierresesion: '',
   };
 
   nombreUsuario: string | null = null;
+  rol: string | null = null;
   urlactual: string;
 
   // Definimos la propiedad 'menuItems'
-  menuItems = [
-    { nombreopcion: 'Personas', route: '/personas' },
-    { nombreopcion: 'Usuarios', route: '/mantenimineto_usuarios' },
-    { nombreopcion: 'Dashboard', route: '/dashboard' }
-  ];
+  menuItems: MenuItem[] = [];
 
   constructor(private authService: AuthService, private router: Router, private apiService: ApiService) {
     this.nombreUsuario = this.authService.nombreUser;
-    this.urlactual = this.router.url;
-    this.getRolOpciones()
+    this.rol = this.authService.es_staff ? 'Administrador' : 'Usuario';
+    this.urlactual = this.router.url
+    this.getOpciones()
+    this.getDatosBienvenida()
   }
 
-  getRolOpciones() {
-    this.apiService.get<any[]>('rol_opciones')
+  getDatosBienvenida() {
+    this.apiService.get<Usuario>(`datos_bienvenida/${this.authService.id}`)
       .subscribe(
         data => {
+          this.usuario = data;  // Aquí ya no necesitas un bucle, simplemente asigna los datos
           console.log(data);
-
-          // Generamos las URLs para cada opción
-          this.menuItems = data.map(item => {
-            // Aquí generamos la URL basándonos en el nombre de la opción
-            let route = '';
-
-            // Generamos la URL según el nombre de la opción
-            switch (item.nombreopcion) {
-              case 'Personas':
-                route = '/personas';
-                break;
-              case 'Usuarios':
-                route = '/mantenimineto_usuarios';
-                break;
-              case 'Dashboard':
-                route = '/dashboard';
-                break;
-              default:
-                route = '/'; // O alguna ruta predeterminada si no hay coincidencia
-                break;
-            }
-
-            // Retornamos el objeto con 'nombreopcion' y la 'route' generada
-            return {
-              ...item,
-              route: route
-            };
-          });
-
-          console.log(this.menuItems); // Verifica que las rutas se asignaron correctamente
         },
         error => {
-          console.error('Error fetching menu options:', error);
+          console.error(error.message);
+          alert(error.message);
+        }
+      );
+  }
+
+  getOpciones() {
+    this.apiService.get<MenuItem[]>(`menu_usuario/${this.authService.id}`)
+      .subscribe(
+        data => {
+          this.menuItems = data;  // Aquí ya no necesitas un bucle, simplemente asigna los datos
+          console.log(data);
+        },
+        error => {
+          console.error(error.message);
+          alert(error.message);
         }
       );
   }
