@@ -4,6 +4,10 @@ import cors from 'cors';
 import LoginRoute from "./routers/loginRoute.js";
 import InfoSistemaRouter from "./routers/infoSistemaRoute.js";
 import UsuarioRouter from "./routers/usuarioRoute.js";
+import RolRouter from "./routers/rolRoute.js";
+import Rol_UsuarioRoute from "./routers/rol_UsuarioRoute.js";
+import Rol_rolOpcionesRoute from "./routers/rol_rolOpcionesRoute.js";
+import RolOpcionesRouter from "./routers/rolOpcionesRoute.js";
 
 const app = express();
 
@@ -24,6 +28,10 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use('/api', LoginRoute);
 app.use('/api', InfoSistemaRouter);
 app.use('/api', UsuarioRouter);
+app.use('/api', RolRouter);
+app.use('/api', Rol_rolOpcionesRoute);
+app.use('/api', RolOpcionesRouter);
+app.use('/api', Rol_UsuarioRoute);
 
 
 // Ruta de prueba

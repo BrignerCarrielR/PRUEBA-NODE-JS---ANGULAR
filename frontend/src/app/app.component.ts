@@ -21,6 +21,7 @@ export class AppComponent {
     this.login = this.authService.isLoggedIn;
     this.nombreUsuario = this.authService.nombreUser;
     this.es_staff = this.authService.es_staff;
+    console.log(this.authService.nombreUser);
   }
 
   CerrarSesion() {

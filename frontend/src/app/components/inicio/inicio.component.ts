@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import {AuthService} from '../../auth.service';
 import {Router} from '@angular/router';
 import {CommonModule} from '@angular/common';
@@ -29,7 +29,7 @@ interface Usuario {
   templateUrl: './inicio.component.html',
   styleUrls: ['./inicio.component.css']
 })
-export class InicioComponent {
+export class InicioComponent implements OnInit{
   usuario: Usuario = {
     username: '',
     mail: '',
@@ -38,10 +38,10 @@ export class InicioComponent {
     fechaingresosesion: '',
     fechacierresesion: '',
   };
-
   nombreUsuario: string | null = null;
   rol: string | null = null;
   urlactual: string;
+  Islogin: boolean | null = null;
 
   // Definimos la propiedad 'menuItems'
   menuItems: MenuItem[] = [];
@@ -53,6 +53,15 @@ export class InicioComponent {
     this.getOpciones()
     this.getDatosBienvenida()
   }
+
+  ngOnInit(): void {
+    this.Islogin = this.authService.isLoggedIn;
+    if (!this.Islogin) {
+      window.location.href = '/';  // Redirigir si el usuario ya está logueado
+    }
+  }
+
+
 
   getDatosBienvenida() {
     this.apiService.get<Usuario>(`datos_bienvenida/${this.authService.id}`)

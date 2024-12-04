@@ -5,5 +5,6 @@ const LoginRouter = Router();
 
 LoginRouter.post("/login", LoginController.Login);
 LoginRouter.get("/logout/:id", LoginController.Logout);
+LoginRouter.post("/reset_password/", LoginController.RecuperarContrasena);
 
 export default LoginRouter;

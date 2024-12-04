@@ -52,5 +52,52 @@ export class UsuarioModel {
         }
     }
 
+    static async PostUsuarios(usuarios) {
+        const db = await pool.connect();
+        try {
+            const resultados = []; // lista para almacenar todos los resultados de cada iteracion
+
+            for (const usuario of usuarios) {
+                console.log(`Procesando usuario: ${usuario.nombres}`);
+
+                // Ejecutar la consulta y capturar el resultado
+                const result = await db.query(queries.postUsario, [
+                    usuario.nombres,
+                    usuario.apellidos,
+                    usuario.identificacion,
+                    usuario.username,
+                    usuario.password
+                ]);
+
+                // Agregar el mensaje devuelto por la consulta al arreglo de resultados
+                const mensaje = result.rows[0].crear_usuario_con_validaciones || `Usuario ${usuario.username} procesado sin mensaje específico.`;
+                resultados.push({ usuario: usuario.username, mensaje });
+            }
+            console.log({resultados});
+            // Devolver todos los resultados al final
+            return {resultados} ;
+        } catch (error) {
+            console.error('Error procesando usuarios:', error);
+            throw error;
+        } finally {
+            db.release();
+        }
+    }
+
+    static async PutStatusUsuario(estado, id) {
+        const db = await pool.connect();
+        try {
+            await db.query(queries.putStatusUsuario, [estado, id]);
+            return {message: 'Se actualizo el estado correctamente.'};
+        } catch (error) {
+            throw error;
+        } finally {
+            db.release();
+        }
+    }
+
+
+
+
 
 }

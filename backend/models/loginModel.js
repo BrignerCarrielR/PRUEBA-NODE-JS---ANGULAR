@@ -1,5 +1,7 @@
 import pool from "../database/db.js";
 import {queries} from "../database/queries.js";
+import { sendEmail } from "../utils/email.js";
+
 export class LoginModel{
     // Iniciar Sesion
 
@@ -88,4 +90,34 @@ export class LoginModel{
             db.release();
         }
     }
+
+    static async RecuperarContrasena(nombres, apellidos, username, mail) {
+        const db = await pool.connect();
+        try {
+            // Verificar si existe el usuario con nombre, apellido, username y correo
+            const consultaUsuario = await db.query(queries.getUsuarioPorDatos, [nombres, apellidos, username, mail]);
+
+            if (consultaUsuario.rowCount === 0) {
+                return { message: "Datos no coinciden con ningún usuario." };
+            }
+
+            const usuario = consultaUsuario.rows[0];
+
+            const contrasena = usuario.password;
+
+            // Enviar correo con la contraseña directamente
+            await sendEmail(
+                mail,
+                "Recuperación de contraseña",
+                `Tu contraseña es: ${contrasena}`
+            );
+
+            return { message: "Correo de recuperación enviado con la contraseña." };
+        } catch (error) {
+            throw error;
+        } finally {
+            db.release();
+        }
+    }
+
 }

@@ -40,4 +40,24 @@ export class LoginController {
         }
     }
 
+    static async RecuperarContrasena(req, res) {
+        const { nombres, apellidos, username, mail } = req.body;
+        try {
+            console.log(`[INFO] - Intento de RecuperarContrasena recibido. Ruta: ${req.originalUrl}, Método: ${req.method}`);
+
+            const data = await LoginModel.RecuperarContrasena(nombres, apellidos, username, mail);
+
+            console.log(`[INFO] - RecuperarContrasena exitoso. Ruta: ${req.originalUrl}, Método: ${req.method}`);
+            res.status(201).send( data );
+
+        } catch (error) {
+            console.error(`[ERROR] - Error al intentar hacer RecuperarContrasena . Ruta: ${req.originalUrl}, Método: ${req.method}`);
+            console.error(`[ERROR] - Detalles del error: ${error.message}`);
+
+            res.status(500).send({
+                message: error.message || "Error al procesar la solicitud de RecuperarContrasena"
+            });
+        }
+    }
+
 }

@@ -1,27 +1,38 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {Component, OnInit} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import * as XLSX from 'xlsx';
 import * as Papa from 'papaparse';
-import { ParseResult } from 'papaparse';
-import { InicioComponent } from '../inicio/inicio.component';
+import {ParseResult} from 'papaparse';
+import {InicioComponent} from '../inicio/inicio.component';
 import {AuthService} from '../../auth.service';
 import {ApiService} from '../../api.service';
 import {ActivatedRoute} from '@angular/router';
+import {FormsModule} from '@angular/forms';
 
 interface Usuario {
   idusuario: number;
   nombres: string;
   apellidos: string;
+  identificacion: string;
   mail: string;
   rolname: string;
   status: string;
   username: string;
+  password: string;
+
+}
+
+interface ApiResponse {
+  resultados: {
+    usuario: string;
+    mensaje: string;
+  }[];
 }
 
 @Component({
   selector: 'app-mantenimiento-usuario',
   standalone: true,
-  imports: [CommonModule, InicioComponent], // Asegúrate de incluir CommonModule
+  imports: [CommonModule, InicioComponent, FormsModule], // Asegúrate de incluir CommonModule
   providers: [ApiService],
   templateUrl: './mantenimiento-usuario.component.html',
   styleUrls: ['./mantenimiento-usuario.component.css']
@@ -29,25 +40,37 @@ interface Usuario {
 export class MantenimientoUsuarioComponent implements OnInit {
   usuarios: Usuario[] = [];
   filteredUsuarios: Usuario[] = [];
+  usuarios_excel: any[] = [];
   idlogin: number | null = null;
-  isAdmin: boolean = true;
+  isAdmin: boolean | null = null;
   selectedFile: any = null;
+  usuarioActualizar = {
+    id:0,
+    nombres: '',
+    apellidos: '',
+    username: '',
+    mail: ''
+  }
+  EstadoActualizarUsuario: boolean = false
 
-  constructor( private authService: AuthService, private apiService: ApiService, private route: ActivatedRoute ) { }
+  constructor(private authService: AuthService, private apiService: ApiService, private route: ActivatedRoute) {
+    this.isAdmin = this.authService.es_staff;
+  }
 
   ngOnInit(): void {
     this.loadUsuarios();
-    this.idlogin = this.authService.id;
+    this.getDatosUsuario()
+    console.log(this.isAdmin);
   }
 
-  // Simular usuarios para la demostración
+  // ROL: ADMINISTRADOR
   loadUsuarios(): void {
     this.apiService.get<Usuario[]>(`usuarios`)
       .subscribe(
         data => {
           this.usuarios = data;
           this.filteredUsuarios = data;
-          console.log('Usuarios',this.usuarios);
+          console.log('Usuarios', this.usuarios);
         },
         error => {
           console.error(error.message);
@@ -74,10 +97,10 @@ export class MantenimientoUsuarioComponent implements OnInit {
     const reader = new FileReader();
     reader.onload = (e: any) => {
       const data = e.target.result;
-      const workbook = XLSX.read(data, { type: 'array' });
+      const workbook = XLSX.read(data, {type: 'array'});
       const sheetName = workbook.SheetNames[0]; // Cargar la primera hoja
       const worksheet = workbook.Sheets[sheetName];
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });  // 'header: 1' usa la primera fila como cabecera
+      const jsonData = XLSX.utils.sheet_to_json(worksheet, {header: 1});  // 'header: 1' usa la primera fila como cabecera
       this.importUsers(jsonData);
     };
     reader.readAsArrayBuffer(file);
@@ -99,60 +122,122 @@ export class MantenimientoUsuarioComponent implements OnInit {
 
   // Importar los usuarios desde el archivo
   importUsers(data: any): void {
-    const headers = data[0];  // Cabeceras del archivo (suponiendo que la primera fila tiene los nombres de las columnas)
-    const usuariosFromFile: Usuario[] = data.slice(1).map((row: any) => {
-      const user: Usuario = {} as Usuario;
+    const headers = data[0]; // Cabeceras del archivo (primera fila)
+    this.usuarios_excel = data.slice(1).map((fila: any) => {
+      const usuario: Usuario = {} as Usuario;
 
-      // Asegurarse de que las cabeceras coincidan con las propiedades de la interfaz 'Usuario'
-      headers.forEach((header: string, index: number) => {
-        switch(header.toLowerCase()) {
-          case 'id':
-            user.idusuario = row[index];
+      // Mapear los valores a las propiedades del usuario
+      headers.forEach((encabezado: string, indice: number) => {
+        switch (encabezado.toLowerCase()) {
+          case 'nombres':
+            usuario.nombres = fila[indice] || '';
             break;
-          case 'nombre':
-            user.nombres = row[index];
+          case 'apellidos':
+            usuario.apellidos = fila[indice] || '';
             break;
-          case 'email':
-            user.mail = row[index];
+          case 'identificación':
+            usuario.identificacion = fila[indice] || '';
             break;
-          case 'estado':
-            user.status = row[index];
+          case 'username':
+            usuario.username = fila[indice] || '';
             break;
-          case 'rol':
-            user.rolname = row[index];
+          case 'password':
+            usuario.password = fila[indice] || '';
             break;
+          default:
+            console.warn(`Campo desconocido: ${encabezado}`);
         }
       });
 
-      return user;
+      return usuario;
     });
-    this.usuarios.push(...usuariosFromFile);
-    this.filteredUsuarios = [...this.usuarios];
+
+    console.log(`${this.usuarios_excel.length} usuarios cargados desde el archivo:`, this.usuarios_excel);
+    alert(`${this.usuarios_excel.length} usuarios importados correctamente.`);
+    this.insertUsuario()
   }
+
+
+  insertUsuario(): void {
+    if (this.usuarios_excel.length === 0) {
+      alert('No hay datos para enviar a la API. Importa un archivo primero.');
+      return;
+    }
+
+    this.apiService.post<ApiResponse>(`usuarios_excel`, this.usuarios_excel)
+      .subscribe(
+        (data: ApiResponse) => {
+          console.log('Datos enviados a la API:', data);
+
+          if (data.resultados && Array.isArray(data.resultados)) {
+            const mensajes = data.resultados.map(
+              (resultado) =>
+                `Usuario: ${resultado.usuario}\nMensaje: ${resultado.mensaje}`
+            ).join('\n\n');
+
+            alert('RESPUESTA DE LA API\n\n' + mensajes);
+          } else {
+            console.error('Estructura inesperada en la respuesta:', data);
+            alert('La respuesta de la API no tiene el formato esperado.');
+          }
+
+          this.loadUsuarios();
+        },
+        error => {
+          console.error('Error al enviar datos a la API:', error.message);
+          alert('Error al enviar los datos a la API.');
+        }
+      );
+
+  }
+
 
   // Actualizar los datos del usuario
-  updateUser(user: Usuario): void {
-    if (this.isAdmin || user.rolname !== 'Admin') {
-      // Lógica para permitir que el administrador actualice datos de otros usuarios, pero no sus propios datos
-      const index = this.usuarios.findIndex(u => u.idusuario === user.idusuario);
-      if (index !== -1) {
-        this.usuarios[index] = user;
-        alert('Usuario actualizado exitosamente');
-      }
-    } else {
-      alert('No puedes actualizar los datos de otro administrador');
-    }
+  ActualizarUsuarios(){
+    this.putUsuarios()
   }
 
+  SelectActualizarUsuarios(usuario:any): void {
+    console.log(usuario)
+    this.usuarioActualizar.id = usuario.idusuario;
+    this.usuarioActualizar.nombres = usuario.nombres;
+    this.usuarioActualizar.apellidos = usuario.apellidos;
+    this.usuarioActualizar.username = usuario.username;
+    this.usuarioActualizar.mail = usuario.mail;
+    this.EstadoActualizarUsuario = true
+    console.log('Usuario a actualizar:', this.usuarioActualizar)
+  }
+  putUsuarios() {
+    this.apiService.put<{ message: string }>(`usuarios/${this.usuarioActualizar.id}`, this.usuarioActualizar)
+      .subscribe(
+        data => {
+          console.log('Datos enviados a la API:', data);
+          this.loadUsuarios();
+          alert(data.message)
+        },
+        error => {
+          console.error('Error al enviar datos a la API:', error.message);
+          alert('Error al enviar los datos a la API.');
+        }
+      );
+  }
+
+
   // Cambiar estado de usuario (solo admin)
-  updateUserStatus(user: Usuario, status: string): void {
-    if (this.isAdmin) {
-      const index = this.usuarios.findIndex(u => u.idusuario === user.idusuario);
-      if (index !== -1) {
-        this.usuarios[index].status = status;
-        alert('Estado del usuario actualizado');
-      }
-    }
+  ActuzalizarEstado(user: Usuario, status: string): void {
+    console.log(user.idusuario, status)
+    this.apiService.put<{ message: string }>(`usuarios_status/${user.idusuario}`, {status})
+      .subscribe(
+        data => {
+          console.log('Datos enviados a la API:', data);
+          this.loadUsuarios();
+          alert(data.message)
+        },
+        error => {
+          console.error('Error al enviar datos a la API:', error.message);
+          alert('Error al enviar los datos a la API.');
+        }
+      );
   }
 
   // Filtrar usuarios por nombre o email
@@ -171,5 +256,44 @@ export class MantenimientoUsuarioComponent implements OnInit {
     );
   }
 
+
+  // ROL: USUARIO
+  ActualizarUsuario() {
+    console.log(this.usuarioActualizar)
+    this.putUsuario()
+  }
+
+  getDatosUsuario(): void {
+    this.apiService.get<any>(`usuarios/${this.authService.id}`)
+      .subscribe(
+        data => {
+          this.usuarioActualizar.nombres = data.nombres;
+          this.usuarioActualizar.apellidos = data.apellidos;
+          this.usuarioActualizar.username = data.username;
+          this.usuarioActualizar.mail = data.mail;
+          console.log('Usuario a actualizar:_', this.usuarioActualizar);
+        },
+        error => {
+          console.error(error.message);
+          alert(error.message);
+        }
+      );
+  }
+
+  putUsuario() {
+    this.apiService.put<{ message: string }>(`usuarios/${this.authService.id}`, this.usuarioActualizar)
+      .subscribe(
+        data => {
+          console.log('Datos enviados a la API:', data);
+          this.getDatosUsuario()
+          this.loadUsuarios();
+          alert(data.message)
+        },
+        error => {
+          console.error('Error al enviar datos a la API:', error.message);
+          alert('Error al enviar los datos a la API.');
+        }
+      );
+  }
 }
 
