@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { CommonModule } from '@angular/common';
-import { AuthService } from './auth.service';
+import {Component} from '@angular/core';
+import {RouterOutlet} from '@angular/router';
+import {CommonModule} from '@angular/common';
+import {AuthService} from './auth.service';
 import {ApiService} from './api.service';
 import {HttpClientModule} from '@angular/common/http';
 
@@ -13,10 +13,12 @@ import {HttpClientModule} from '@angular/common/http';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
+
 export class AppComponent {
   login: boolean;
   nombreUsuario: any;
-  es_staff: boolean=false;
+  es_staff: boolean = false;
+
   constructor(private authService: AuthService, private apiService: ApiService) {
     this.login = this.authService.isLoggedIn;
     this.nombreUsuario = this.authService.nombreUser;
@@ -25,12 +27,12 @@ export class AppComponent {
   }
 
   CerrarSesion() {
-    this.apiService.get(`logout/${this.authService.id}`)
+    this.apiService.get(`auth/logout/${this.authService.id}`)
       .subscribe(
         (data: any) => {
           alert(data.message)
           this.authService.logoutUser();
-          window.location.href="/";
+          window.location.href = "/";
         },
         error => {
           console.error(error.message);

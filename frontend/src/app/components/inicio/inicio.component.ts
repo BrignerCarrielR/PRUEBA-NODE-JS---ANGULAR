@@ -64,7 +64,7 @@ export class InicioComponent implements OnInit{
 
 
   getDatosBienvenida() {
-    this.apiService.get<Usuario>(`datos_bienvenida/${this.authService.id}`)
+    this.apiService.get<Usuario>(`infoSistema/datos_bienvenida/${this.authService.id}`)
       .subscribe(
         data => {
           this.usuario = data;  // Aquí ya no necesitas un bucle, simplemente asigna los datos
@@ -78,7 +78,7 @@ export class InicioComponent implements OnInit{
   }
 
   getOpciones() {
-    this.apiService.get<MenuItem[]>(`menu_usuario/${this.authService.id}`)
+    this.apiService.get<MenuItem[]>(`infoSistema/menu_usuario/${this.authService.id}`)
       .subscribe(
         data => {
           this.menuItems = data;  // Aquí ya no necesitas un bucle, simplemente asigna los datos

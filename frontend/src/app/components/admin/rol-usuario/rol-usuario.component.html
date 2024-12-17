@@ -1,38 +1,57 @@
 <app-inicio>
-  <form (ngSubmit)="GuardarRolUsuario()">
-    <div class="min-h-screen bg-gray-100 p-6">
-      <h1 class="text-2xl text-center text-gray-600 font-bold mb-8">Asignar Rol</h1>
+  <h1 class="text-2xl font-bold text-gray-800">Asignar Rol a Usuarios</h1>
+  <p class="text-gray-600">Asigna roles a los usuarios para gestionar mejor sus permisos.</p>
+  <div class="px-8 py-10 ">
 
-      <!-- Panel de Indicadores -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <!-- Indicador de Usuarios sin Roles -->
-        <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-          <h3 class="font-medium text-gray-600">Usuarios sin Roles</h3>
-          <select [(ngModel)]="datosRolUsuario.idusuario" name="usuario" class="mt-2 border rounded-lg py-2 w-full">
+    <!-- Formulario principal -->
+    <form (ngSubmit)="GuardarRolUsuario()"
+          class="max-w-5xl mx-auto bg-white rounded-xl shadow-lg p-10 border border-gray-200">
+      <!-- Panel de selección -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <!-- Usuarios sin Roles -->
+        <div class="bg-gray-100 p-6 rounded-lg border border-gray-300 shadow-inner">
+          <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+            <span class="material-icons text-blue-600 mr-2">Usuarios</span> sin Roles
+          </h3>
+          <select
+            [(ngModel)]="datosRolUsuario.idusuario"
+            name="usuario"
+            class="w-full border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring focus:ring-blue-300"
+          >
             <option *ngFor="let usuario of usuarios" [value]="usuario.idusuario">
               {{ usuario.username }}
             </option>
           </select>
-          <p class="text-sm text-blue-500 text-end">Selecciona un usuario</p>
+          <p class="text-sm text-gray-500 mt-3">Selecciona un usuario para asignarle un rol.</p>
         </div>
 
-        <!-- Indicador de Roles -->
-        <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-          <h3 class="font-medium text-gray-600">Roles</h3>
-          <select [(ngModel)]="datosRolUsuario.idrol" name="rol" class="mt-2 border rounded-lg py-2 w-full">
+        <!-- Roles disponibles -->
+        <div class="bg-gray-100 p-6 rounded-lg border border-gray-300 shadow-inner">
+          <h3 class="text-xl font-semibold text-gray-700 mb-4 flex items-center">
+            <span class="material-icons text-green-600 mr-2">Roles</span> Disponibles
+          </h3>
+          <select
+            [(ngModel)]="datosRolUsuario.idrol"
+            name="rol"
+            class="w-full border border-gray-300 rounded-lg py-3 px-4 focus:outline-none focus:ring focus:ring-green-300"
+          >
             <option *ngFor="let rol of roles" [value]="rol.idrol">
               {{ rol.rolname }}
             </option>
           </select>
-          <p class="text-sm text-blue-500 text-end">Selecciona un rol</p>
+          <p class="text-sm text-gray-500 mt-3">Selecciona un rol para asignarlo al usuario.</p>
         </div>
       </div>
 
-      <div class="flex mt-4 justify-center">
-        <button type="submit" class="bg-gray-700 py-2 px-4 text-white font-semibold rounded-lg">
-          Registrar rol al Usuario
+      <!-- Botón de acción -->
+      <div class="flex justify-center mt-10">
+        <button
+          type="submit"
+          class="bg-gradient-to-r from-blue-500 to-green-500 text-white py-3 px-8 rounded-full font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-1 transition-all duration-200"
+        >
+          Registrar Rol al Usuario
         </button>
       </div>
-    </div>
-  </form>
+    </form>
+  </div>
 </app-inicio>

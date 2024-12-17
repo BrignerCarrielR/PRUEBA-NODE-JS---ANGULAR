@@ -1,33 +1,38 @@
 <app-inicio>
-  <div class="min-h-screen bg-gray-100 p-6">
-    <h1 class="text-2xl text-center text-gray-600 font-bold mb-8">Dashboard de Administrador</h1>
+  <p class="font-bold text-2xl text-gray-700">Dashboard de Administrador</p>
+  <p class="text-gray-600">Información del estado actual de los usuarios en tiempo real.</p>
+  <div class="p-6 bg-gray-100">
 
     <!-- Panel de Indicadores -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
       <!-- Indicador de Usuarios Activos -->
-      <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-        <h3 class=" font-medium text-gray-600">Usuarios Activos</h3>
-        <p class="text-2xl font-semibold text-indigo-600">{{ dashboard.activos }}</p>
+      <div class="bg-white p-6 rounded-lg shadow-md text-center border-l-4 border-indigo-600">
+        <h3 class="text-lg font-medium text-gray-700">Usuarios Activos</h3>
+        <p class="text-3xl font-bold text-indigo-600 mt-2">{{ dashboard.activos }}</p>
+        <p class="text-sm text-gray-500">Usuarios actualmente activos en el sistema</p>
       </div>
 
       <!-- Indicador de Usuarios Inactivos -->
-      <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-        <h3 class=" font-medium text-gray-600">Usuarios Inactivos</h3>
-        <p class="text-2xl font-semibold text-red-600">{{ dashboard.inactivos }}</p>
+      <div class="bg-white p-6 rounded-lg shadow-md text-center border-l-4 border-red-600">
+        <h3 class="text-lg font-medium text-gray-700">Usuarios Inactivos</h3>
+        <p class="text-3xl font-bold text-red-600 mt-2">{{ dashboard.inactivos }}</p>
+        <p class="text-sm text-gray-500">Usuarios que no han iniciado sesión recientemente</p>
       </div>
 
       <!-- Indicador de Usuarios Bloqueados -->
-      <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-        <h3 class=" font-medium text-gray-600">Usuarios Bloqueados</h3>
-        <p class="text-2xl font-semibold text-gray-500">{{ dashboard.bloqueados }}</p>
+      <div class="bg-white p-6 rounded-lg shadow-md text-center border-l-4 border-gray-500">
+        <h3 class="text-lg font-medium text-gray-700">Usuarios Bloqueados</h3>
+        <p class="text-3xl font-bold text-gray-500 mt-2">{{ dashboard.bloqueados }}</p>
+        <p class="text-sm text-gray-500">Usuarios con acceso restringido</p>
       </div>
 
-    </div>
-    <!-- Indicador de Sesiones Fallidas -->
-    <div class="bg-white p-6 rounded-lg shadow-lg text-center mt-5">
-      <h3 class=" font-medium text-gray-600">Sesiones Fallidas</h3>
-      <p class="text-2xl font-semibold text-gray-500">{{ dashboard.sesion_fallidas }}</p>
+      <!-- Indicador de Sesiones Fallidas -->
+      <div class="bg-white p-6 rounded-lg shadow-md text-center border-l-4 border-yellow-600">
+        <h3 class="text-lg font-medium text-gray-700">Sesiones Fallidas</h3>
+        <p class="text-3xl font-bold text-yellow-600 mt-2">{{ dashboard.sesion_fallidas }}</p>
+        <p class="text-sm text-gray-500">Intentos de inicio de sesión fallidos</p>
+      </div>
     </div>
   </div>
-
 </app-inicio>
+

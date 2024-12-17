@@ -30,7 +30,7 @@ export class ResetPasswordComponent {
 
   postRecuperarContrasena(): void {
     console.log(this.dataRecuperar);
-    this.apiService.post<{ message: string }>('reset_password', this.dataRecuperar)
+    this.apiService.post<{ message: string }>('auth/recuperar_contrasena', this.dataRecuperar)
       .subscribe(
         (data: any) => {
           alert(data.message)

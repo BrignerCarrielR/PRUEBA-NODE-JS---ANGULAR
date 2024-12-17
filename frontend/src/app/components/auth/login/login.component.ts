@@ -17,7 +17,7 @@ export class LoginComponent implements OnInit {  // Implementa OnInit
   Islogin: boolean | null = null;
 
   dataLogin = {
-    username: '',
+    usernameORmail: '',
     password: ''
   }
 
@@ -32,7 +32,7 @@ export class LoginComponent implements OnInit {  // Implementa OnInit
 
   login() {
     console.log(this.dataLogin);
-    this.apiService.post('login', this.dataLogin)
+    this.apiService.post('auth/login', this.dataLogin)
       .subscribe(
         (data: any) => {
           console.log(data);

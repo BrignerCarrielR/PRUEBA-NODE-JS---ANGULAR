@@ -1,130 +1,145 @@
 <app-inicio>
-  <div *ngIf="isAdmin else noAdmin" class="min-h-screen bg-gray-100 p-6">
-    <h1 class="text-2xl text-center text-gray-600 font-bold mb-6">
-      Mantenimiento de Usuarios
-    </h1>
+  <h1 class="text-2xl font-bold text-gray-800">Mantenimiento de Usuarios</h1>
+  <p class="text-gray-600">Administra y modifica la información de los usuarios registrados en el sistema.</p>
+  <div class="p-6 bg-gray-100">
 
-    <!-- Filtro de búsqueda -->
-    <div class="mb-6 flex justify-center">
-      <input (input)="filterUsuarios($event)" class="p-2 border rounded-md" placeholder="Buscar usuario"/>
-    </div>
+    <!-- Contenido principal -->
+    <div *ngIf="isAdmin else noAdmin" class="grid grid-cols-1 gap-6">
 
-    <!-- Botón para cargar archivo -->
-    <div class="mb-6 flex justify-center">
-      <input
-        type="file"
-        accept=".xlsx,.csv"
-        (change)="onFileChange($event)"
-        class="p-2 border rounded-md"
-      />
-    </div>
-    <form (ngSubmit)="EstadoActualizarUsuario ? ActualizarUsuarios() : ActualizarUsuario()">
-      <div class="grid grid-cols-4">
-        <div class="m-2 flex flex-col">
-          <label>Nombres</label>
-          <input class="w-full rounded-lg py-1 px-2"
-                 type="text"
-                 [(ngModel)]="usuarioActualizar.nombres"
-                 name="nombres"
-          >
-        </div>
-        <div class="m-2 flex flex-col">
-          <label>Apellidos</label>
-          <input class="w-full rounded-lg py-1 px-2"
-                 type="text"
-                 [(ngModel)]="usuarioActualizar.apellidos"
-                 name="apellidos">
-        </div>
-        <div class="m-2 flex flex-col">
-          <label>Username</label>
-          <input class="w-full rounded-lg py-1 px-2" type="text"
-                 [(ngModel)]="usuarioActualizar.username"
-                 name="username">
-        </div>
-        <div class="m-2 flex flex-col">
-          <label>Mail</label>
-          <input class="w-full rounded-lg py-1 px-2" type="text"
-                 [(ngModel)]="usuarioActualizar.mail"
-                 name="mail">
+      <!-- Filtro de búsqueda -->
+      <div class="bg-white shadow-lg rounded-lg p-6 flex items-center space-x-4">
+        <p class="text-lg font-semibold text-gray-700">Buscar por nombre:</p>
+        <input (input)="filterUsuarios($event)"
+               class="flex-grow p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+               placeholder="Ingresa el nombre"/>
+        <button (click)="actualizarDatosAdmin()"
+                class="bg-gray-700 text-white rounded-lg py-2 px-4 hover:bg-gray-800">
+          Actualizar mis datos
+        </button>
+      </div>
+
+      <!-- Listado de usuarios -->
+      <div>
+        <h2 class="text-xl font-bold text-gray-700 mb-4">Listado de usuarios</h2>
+        <div class="overflow-hidden bg-white shadow-lg rounded-lg">
+          <table class="min-w-full text-sm">
+            <thead class="bg-gray-200 text-gray-700">
+            <tr>
+              <th class="px-6 py-3 text-left font-semibold">Nombre</th>
+              <th class="px-6 py-3 text-left font-semibold">Email</th>
+              <th class="px-6 py-3 text-left font-semibold">Estado</th>
+              <th class="px-6 py-3 text-left font-semibold">Rol</th>
+              <th class="px-6 py-3 text-left font-semibold">Acciones</th>
+            </tr>
+            </thead>
+            <tbody class="bg-white">
+            <tr *ngFor="let user of filteredUsuarios" class="border-b border-gray-200 hover:bg-gray-50">
+              <td class="px-6 py-4">{{ user.nombres }} {{ user.apellidos }}</td>
+              <td class="px-6 py-4">{{ user.mail }}</td>
+              <td class="px-6 py-4">
+                <button *ngIf="user.rolname === 'Usuario'" (click)="ActualizarEstadoUsuario(user, user.status)"
+                        class="px-4 py-2 rounded-lg text-white focus:outline-none"
+                        [ngClass]="{
+                          'bg-green-500 hover:bg-green-600': user.status === 'Activo',
+                          'bg-red-500 hover:bg-red-600': user.status !== 'Activo'
+                        }">
+                  {{ user.status }}
+                </button>
+              </td>
+              <td class="px-6 py-4">{{ user.rolname }}</td>
+              <td class="px-6 py-4">
+                <button *ngIf="user.rolname === 'Usuario'" (click)="SelectActualizarUsuarios(user)"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg focus:outline-none">
+                  Actualizar
+                </button>
+              </td>
+            </tr>
+            </tbody>
+          </table>
         </div>
       </div>
-      <button type="submit" class="py-1 px-2 bg-gray-700 text-white font-semibold rounded-lg my-2">Actualizar Datos</button>
-      <a class="py-1 m-1 px-2 bg-gray-300  font-semibold rounded-lg my-2" href="/mantenimiento_usuario">Datos de mi usuario</a>
 
-
-    </form>
-
-    <!-- Tabla de usuarios -->
-    <table class="min-w-full bg-white rounded-lg shadow-md overflow-hidden">
-      <thead>
-      <tr>
-        <th class="px-4 py-2 text-left">Nombre</th>
-        <th class="px-4 py-2 text-left">Email</th>
-        <th class="px-4 py-2 text-left">Estado</th>
-        <th class="px-4 py-2 text-left">Rol</th>
-        <th class="px-4 py-2 text-left">Acciones</th>
-      </tr>
-      </thead>
-      <tbody>
-      <tr *ngFor="let user of filteredUsuarios">
-        <td class="px-4 py-2">{{ user.nombres }}</td>
-        <td class="px-4 py-2">{{ user.mail }}</td>
-        <td class="px-4 py-2">
-          <button *ngIf="user.rolname === 'Usuario'" (click)="ActuzalizarEstado(user, user.status === 'Activo' ? 'Inactivo' : 'Activo')"
-            class="bg-yellow-500 text-white px-3 py-1 rounded">
-            {{ user.status }}
-          </button>
-        </td>
-        <td class="px-4 py-2">{{ user.rolname }}</td>
-        <td class="px-4 py-2">
-          <button *ngIf="user.rolname === 'Usuario'" (click)="SelectActualizarUsuarios(user)"
-                  class="bg-blue-500 text-white px-3 py-1 rounded">
-            Actualizar
-          </button>
-        </td>
-      </tr>
-      </tbody>
-    </table>
-  </div>
-  <ng-template #noAdmin>
-    <div class="min-h-screen bg-gray-100 p-6">
-      <h1 class="text-2xl text-center text-gray-600 font-bold mb-6">
-        Mantenimiento de tu Usuario
-      </h1>
-      <form (ngSubmit)="ActualizarUsuario()">
-        <div class="grid grid-cols-2">
-          <div class="m-2 flex flex-col">
-            <label>Nombres</label>
-            <input class="w-full rounded-lg py-1 px-2"
-                   type="text"
-                   [(ngModel)]="usuarioActualizar.nombres"
-                   name="nombres"
-            >
-          </div>
-          <div class="m-2 flex flex-col">
-            <label>Apellidos</label>
-            <input class="w-full rounded-lg py-1 px-2"
-                   type="text"
-                   [(ngModel)]="usuarioActualizar.apellidos"
-                   name="apellidos">
-          </div>
-          <div class="m-2 flex flex-col">
-            <label>Username</label>
-            <input class="w-full rounded-lg py-1 px-2" type="text"
-                   [(ngModel)]="usuarioActualizar.username"
-                   name="username">
-          </div>
-          <div class="m-2 flex flex-col">
-            <label>Mail</label>
-            <input class="w-full rounded-lg py-1 px-2" type="text"
-                   [(ngModel)]="usuarioActualizar.mail"
-                   name="mail">
-          </div>
+      <!-- Modal para actualizar usuario -->
+      <div *ngIf="showModal" class="fixed inset-0 flex items-center justify-center z-50 bg-gray-800 bg-opacity-50">
+        <div class="bg-white rounded-lg p-8 w-96 shadow-xl">
+          <h2 class="text-2xl text-center mb-6 font-bold text-gray-700">Actualizar Usuario</h2>
+          <form (ngSubmit)="EstadoActualizarUsuario ? ActualizarUsuarios() : ActualizarUsuario()">
+            <div class="mb-4">
+              <label class="block font-semibold">Nombres</label>
+              <input [(ngModel)]="usuarioActualizar.nombres" name="nombres"
+                     class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     type="text"/>
+            </div>
+            <div class="mb-4">
+              <label class="block font-semibold">Apellidos</label>
+              <input [(ngModel)]="usuarioActualizar.apellidos" name="apellidos"
+                     class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     type="text"/>
+            </div>
+            <div class="mb-4">
+              <label class="block font-semibold">Username</label>
+              <input [(ngModel)]="usuarioActualizar.username" name="username"
+                     class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     type="text"/>
+            </div>
+            <div class="mb-4">
+              <label class="block font-semibold">Mail</label>
+              <input [(ngModel)]="usuarioActualizar.mail" name="mail"
+                     class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     type="text"/>
+            </div>
+            <div class="flex justify-between">
+              <button type="submit"
+                      class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg focus:outline-none">
+                Guardar
+              </button>
+              <button type="button" (click)="showModal = false"
+                      class="bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-lg focus:outline-none">
+                Cancelar
+              </button>
+            </div>
+          </form>
         </div>
-        <button type="submit" class="py-1 px-2 bg-gray-700 text-white font-semibold rounded-lg">Actualizar Datos</button>
-
-
-      </form>
+      </div>
     </div>
-  </ng-template>
+
+    <!-- Sección para usuarios no admin -->
+    <ng-template #noAdmin>
+      <div class="bg-white p-6 rounded-lg shadow-lg">
+        <h1 class="text-2xl text-gray-700 font-bold mb-4">Mantenimiento de tu Usuario</h1>
+        <form (ngSubmit)="ActualizarUsuario()">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            <div>
+              <label class="font-semibold">Nombres</label>
+              <input [(ngModel)]="usuarioActualizar.nombres" name="nombres"
+                     class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     type="text"/>
+            </div>
+            <div>
+              <label class="font-semibold">Apellidos</label>
+              <input [(ngModel)]="usuarioActualizar.apellidos" name="apellidos"
+                     class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     type="text"/>
+            </div>
+            <div>
+              <label class="font-semibold">Username</label>
+              <input [(ngModel)]="usuarioActualizar.username" name="username"
+                     class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     type="text"/>
+            </div>
+            <div>
+              <label class="font-semibold">Mail</label>
+              <input [(ngModel)]="usuarioActualizar.mail" name="mail"
+                     class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                     type="text"/>
+            </div>
+          </div>
+          <button type="submit"
+                  class="w-full mt-6 bg-gray-700 hover:bg-gray-800 text-white py-3 px-6 font-semibold rounded-lg">
+            Actualizar Datos
+          </button>
+        </form>
+      </div>
+    </ng-template>
+  </div>
 </app-inicio>

@@ -6,7 +6,7 @@
         <input class="py-2 px-3 border w-full rounded-lg"
                type="text"
                placeholder="Usuario"
-               [(ngModel)]="dataLogin.username"
+               [(ngModel)]="dataLogin.usernameORmail"
                name="UserNameOrEmail"
         >
         <input class="py-2 px-3 border w-full rounded-lg"
@@ -18,7 +18,7 @@
       </div>
       <button type="submit"
               class="py-1 w-full bg-red-500 mt-5 font-bold text-white rounded-lg hover:bg-red-600"
-              [disabled]="!dataLogin.username || !dataLogin.password"
+              [disabled]="!dataLogin.usernameORmail || !dataLogin.password"
       >
         Iniciar sesión
       </button>
